@@ -5,10 +5,24 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  
+}
+
+model Booking {
+  id            String    @id
+  checkinDate   DateTime  @map("checkinDate")
+  checkoutDate  DateTime  @map("checkoutDate")
+  numberOfGuests Int
+  totalPrice    Decimal
+  bookingStatus String
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  propertyId    String
+  property      Property  @relation(fields: [propertyId], references: [id])
 }
 
 model User {
-  id             String     @id
+  id             String    @id @default(uuid())
   username       String
   password       String
   name           String
@@ -31,8 +45,9 @@ model Host {
   properties     Property[]
 }
 
+
 model Property {
-  id            String          @id
+  id            String          @id @default(uuid())
   title         String
   description   String
   location      String
@@ -42,10 +57,10 @@ model Property {
   maxGuestCount Int
   rating        Int
   hostId        String
-  host          Host            @relation(fields: [hostId], references: [id])
   amenities     PropertyAmenity[]
   bookings      Booking[]
   reviews       Review[]
+  host          Host            @relation(fields: [hostId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Amenity {
@@ -54,27 +69,16 @@ model Amenity {
   properties  PropertyAmenity[]
 }
 
-model Booking {
-  id            String    @id
-  checkinDate   DateTime  @map("checkinDate")
-  checkoutDate  DateTime  @map("checkoutDate")
-  numberOfGuests Int
-  totalPrice    Decimal
-  bookingStatus String
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  propertyId    String
-  property      Property  @relation(fields: [propertyId], references: [id])
-}
+
 
 model Review {
-  id         String     @id
+  id         String     @id @default(uuid())
   rating     Int
   comment    String
   userId     String
   user       User       @relation(fields: [userId], references: [id])
   propertyId String
-  property   Property   @relation(fields: [propertyId], references: [id])
+  property   Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model PropertyAmenity {
